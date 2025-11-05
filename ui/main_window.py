@@ -296,20 +296,13 @@ class MainWindow(QMainWindow):
 
     def create_image_to_video_tab(self) -> QWidget:
         """Tạo tab Image to Video"""
-        tab = QWidget()
-        layout = QVBoxLayout(tab)
+        from .tabs import ImageToVideoTab
 
-        label = QLabel("Image to Video Tab")
-        label.setObjectName("titleLabel")
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        tab = ImageToVideoTab()
 
-        subtitle = QLabel("Animate images with AI")
-        subtitle.setObjectName("subtitleLabel")
-        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        layout.addWidget(label)
-        layout.addWidget(subtitle)
-        layout.addStretch()
+        # Connect signals
+        tab.generate_requested.connect(self.on_image_to_video_requested)
+        tab.add_to_queue_requested.connect(self.on_add_to_queue_requested)
 
         return tab
 
@@ -739,6 +732,28 @@ class MainWindow(QMainWindow):
         """Handler khi template được save"""
         logger.info(f"Template saved: {template['name']}")
         self.set_status_message(f"Template '{template['name']}' saved")
+
+    # ===== IMAGE TO VIDEO TAB SIGNAL HANDLERS =====
+
+    def on_image_to_video_requested(self, params: dict):
+        """
+        Handler khi user request image to video generation
+
+        Args:
+            params: Generation parameters
+        """
+        logger.info(f"Image to video generation requested: {params}")
+        self.set_status_message(f"Animating image: {Path(params['source_image']).name}")
+
+        # TODO: Implement actual generation
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(
+            self,
+            "Generation Started",
+            f"Image to video generation started!\n\n"
+            f"Source: {Path(params['source_image']).name}\n"
+            f"Animation: {params['animation_prompt'][:50]}..."
+        )
 
 
 # ===== EXPORT =====

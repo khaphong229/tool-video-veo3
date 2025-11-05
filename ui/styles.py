@@ -659,6 +659,8 @@ ICONS = {
     'heart': '❤️',
     'bookmark': '🔖',
     'tag': '🏷️',
+    'arrow_up': '⬆️',
+    'arrow_down': '⬇️',
 }
 
 # ===== HELPER FUNCTIONS =====
