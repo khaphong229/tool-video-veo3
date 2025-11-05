@@ -283,21 +283,14 @@ class MainWindow(QMainWindow):
 
     def create_text_to_video_tab(self) -> QWidget:
         """Tạo tab Text to Video"""
-        tab = QWidget()
-        layout = QVBoxLayout(tab)
+        from .tabs import TextToVideoTab
 
-        # Placeholder - sẽ được implement chi tiết sau
-        label = QLabel("Text to Video Tab")
-        label.setObjectName("titleLabel")
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        tab = TextToVideoTab()
 
-        subtitle = QLabel("Convert text prompts into AI-generated videos")
-        subtitle.setObjectName("subtitleLabel")
-        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        layout.addWidget(label)
-        layout.addWidget(subtitle)
-        layout.addStretch()
+        # Connect signals
+        tab.generate_requested.connect(self.on_generate_video_requested)
+        tab.add_to_queue_requested.connect(self.on_add_to_queue_requested)
+        tab.template_saved.connect(self.on_template_saved)
 
         return tab
 
@@ -715,6 +708,37 @@ class MainWindow(QMainWindow):
             'duration': self.duration_spin.value(),
             'fps': int(self.fps_combo.currentText())
         }
+
+    # ===== TEXT TO VIDEO TAB SIGNAL HANDLERS =====
+
+    def on_generate_video_requested(self, params: dict):
+        """
+        Handler khi user request generate video
+
+        Args:
+            params: Generation parameters
+        """
+        logger.info(f"Video generation requested: {params}")
+        self.set_status_message(f"Generating video: {params['prompt'][:50]}...")
+
+        # TODO: Implement actual video generation
+        # For now, just log the params
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(
+            self,
+            "Generation Started",
+            f"Video generation started!\n\nPrompt: {params['prompt'][:100]}..."
+        )
+
+    def on_add_to_queue_requested(self, params: dict):
+        """Handler khi user add to queue"""
+        logger.info(f"Added to queue: {params}")
+        self.set_status_message("Added to generation queue")
+
+    def on_template_saved(self, template: dict):
+        """Handler khi template được save"""
+        logger.info(f"Template saved: {template['name']}")
+        self.set_status_message(f"Template '{template['name']}' saved")
 
 
 # ===== EXPORT =====
