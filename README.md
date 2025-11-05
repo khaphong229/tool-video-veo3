@@ -15,6 +15,9 @@
 - ⚡ Xử lý bất đồng bộ không chặn UI
 - 🔐 Quản lý API key an toàn
 - 📊 Hỗ trợ nhiều model Veo
+- 💾 **SQLite database** để lưu trữ projects, scenes, video history, và templates
+- 🗂️ Quản lý projects với nhiều scenes
+- 📋 Template system cho style presets
 
 ## Cấu trúc dự án
 
@@ -25,7 +28,8 @@ Veo3/
 │   └── settings.py        # Settings và constants
 ├── core/                  # Logic nghiệp vụ chính
 │   ├── __init__.py
-│   └── api_client.py     # Client kết nối Veo API
+│   ├── api_client.py     # Client kết nối Veo API
+│   └── database.py       # SQLite database manager
 ├── ui/                    # Components giao diện (tùy chỉnh)
 ├── utils/                 # Tiện ích
 │   ├── __init__.py
@@ -36,6 +40,10 @@ Veo3/
 ├── main.py               # File chạy chính
 ├── requirements.txt      # Dependencies
 ├── .env.example         # Template file .env
+├── veo_database.db       # SQLite database (tự động tạo)
+├── examples_database_usage.py  # Examples sử dụng database
+├── test_database.py      # Tests cho database
+├── DATABASE_DOCUMENTATION.md   # Tài liệu database chi tiết
 └── README.md            # Tài liệu này
 ```
 
@@ -201,6 +209,82 @@ result = await client.generate_video(
     aspect_ratio="16:9"
 )
 ```
+
+### DatabaseManager
+
+Database manager để lưu trữ projects, scenes, video history, và templates.
+
+#### Khởi tạo
+
+```python
+from core import DatabaseManager, get_database
+
+# Sử dụng đường dẫn mặc định
+db = get_database()
+
+# Hoặc custom path
+db = DatabaseManager(Path("custom.db"))
+```
+
+#### Các phương thức chính
+
+**Project Management:**
+```python
+# Tạo project
+project_id = db.create_project(
+    name="My Video Project",
+    description="Project description"
+)
+
+# Lấy danh sách projects
+projects = db.get_projects()
+
+# Lấy chi tiết project
+project = db.get_project_by_id(project_id)
+```
+
+**Scene Management:**
+```python
+# Lưu scene
+scene_id = db.save_scene(project_id, {
+    'scene_number': 1,
+    'prompt': 'Opening scene',
+    'duration': 10
+})
+
+# Lấy scenes của project
+scenes = db.get_scenes(project_id)
+```
+
+**Video History:**
+```python
+# Lưu video generation
+video_id = db.save_video_generation({
+    'prompt': 'A beautiful sunset',
+    'model': 'veo-2.0',
+    'status': 'completed',
+    'video_path': 'outputs/video.mp4'
+})
+
+# Lấy lịch sử
+videos = db.get_video_history(limit=10)
+```
+
+**Templates:**
+```python
+# Lưu template
+template_id = db.save_template(
+    name="Cinematic Sunset",
+    base_style="cinematic, golden hour",
+    category="cinematic",
+    tags=["sunset", "dramatic"]
+)
+
+# Lấy templates
+templates = db.get_templates(category="cinematic")
+```
+
+**Xem chi tiết:** [DATABASE_DOCUMENTATION.md](DATABASE_DOCUMENTATION.md)
 
 ## Logging
 
