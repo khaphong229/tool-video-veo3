@@ -1,0 +1,20 @@
+# Dependencies cho ứng dụng tạo video AI với Google Veo API
+
+# PyQt6 - Framework GUI
+PyQt6==6.7.0
+PyQt6-tools==6.7.1.3
+
+# Google AI SDK
+google-genai==1.0.2
+
+# Quản lý biến môi trường
+python-dotenv==1.0.1
+
+# HTTP Client bất đồng bộ
+aiohttp==3.9.5
+
+# Xử lý hình ảnh
+pillow==10.3.0
+
+# Thư viện bổ sung
+requests==2.31.0
