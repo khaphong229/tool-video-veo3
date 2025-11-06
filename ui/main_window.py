@@ -44,6 +44,14 @@ class MainWindow(QMainWindow):
         self.current_project_id: Optional[int] = None
         self.api_connected: bool = False
 
+        # Initialize database manager
+        try:
+            from core import get_database
+            self.db_manager = get_database()
+        except Exception as e:
+            logger.warning(f"Could not initialize database manager: {e}")
+            self.db_manager = None
+
         # Setup UI
         self.setupUi()
         self.apply_theme()
@@ -321,20 +329,14 @@ class MainWindow(QMainWindow):
 
     def create_history_tab(self) -> QWidget:
         """Tạo tab History & Library"""
-        tab = QWidget()
-        layout = QVBoxLayout(tab)
+        from ui.tabs import HistoryTab
 
-        label = QLabel("History & Library Tab")
-        label.setObjectName("titleLabel")
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        tab = HistoryTab(db_manager=self.db_manager, parent=self)
 
-        subtitle = QLabel("Browse your video generation history and saved templates")
-        subtitle.setObjectName("subtitleLabel")
-        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        layout.addWidget(label)
-        layout.addWidget(subtitle)
-        layout.addStretch()
+        # Connect signals
+        tab.video_opened.connect(self.on_video_opened)
+        tab.video_deleted.connect(self.on_video_deleted)
+        tab.video_regenerated.connect(self.on_video_regenerated)
 
         return tab
 
@@ -792,6 +794,31 @@ class MainWindow(QMainWindow):
             "Video Merging",
             f"Merging {len(video_paths)} videos into final output\n\n"
             "This may take a few minutes..."
+        )
+
+    def on_video_opened(self, video_id: int):
+        """Handle video opened from history"""
+        logger.info(f"Video opened: {video_id}")
+        self.set_status_message(f"Opening video {video_id}...")
+
+    def on_video_deleted(self, video_id: int):
+        """Handle video deleted from history"""
+        logger.info(f"Video deleted: {video_id}")
+        self.set_status_message(f"Video {video_id} deleted")
+
+    def on_video_regenerated(self, video_data: dict):
+        """Handle video regeneration request from history"""
+        logger.info(f"Video regeneration requested: {video_data.get('id')}")
+        self.set_status_message(f"Regenerating video {video_data.get('id')}...")
+
+        # TODO: Implement video regeneration
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(
+            self,
+            "Regenerate Video",
+            f"Starting regeneration of video {video_data.get('id')}\n\n"
+            f"Prompt: {video_data.get('prompt', '')[:100]}...\n"
+            f"Model: {video_data.get('model')}"
         )
 
 
