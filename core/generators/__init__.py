@@ -12,6 +12,7 @@ from .base_generator import (
     GenerationFailedError
 )
 from .text_to_video import TextToVideoGenerator
+from .image_to_video import ImageToVideoGenerator
 
 __all__ = [
     'BaseGenerator',
@@ -20,5 +21,6 @@ __all__ = [
     'APIQuotaExceededError',
     'GenerationTimeoutError',
     'GenerationFailedError',
-    'TextToVideoGenerator'
+    'TextToVideoGenerator',
+    'ImageToVideoGenerator'
 ]

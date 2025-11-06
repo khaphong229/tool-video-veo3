@@ -6,6 +6,7 @@ from .api_client import VeoAPIClient, create_client
 from .database import DatabaseManager, get_database
 from .generators import (
     TextToVideoGenerator,
+    ImageToVideoGenerator,
     GenerationStatus,
     GenerationError,
     APIQuotaExceededError,
@@ -19,6 +20,7 @@ __all__ = [
     'DatabaseManager',
     'get_database',
     'TextToVideoGenerator',
+    'ImageToVideoGenerator',
     'GenerationStatus',
     'GenerationError',
     'APIQuotaExceededError',

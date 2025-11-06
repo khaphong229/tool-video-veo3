@@ -603,7 +603,9 @@ class MainWindow(QMainWindow):
         tab_names = ["Text to Video", "Image to Video", "Scene Manager", "History & Library"]
         if 0 <= index < len(tab_names):
             logger.info(f"Switched to tab: {tab_names[index]}")
-            self.status_label.setText(f"Current tab: {tab_names[index]}")
+            # Check if status_label exists (it may not during initialization)
+            if hasattr(self, 'status_label'):
+                self.status_label.setText(f"Current tab: {tab_names[index]}")
 
     def on_add_reference_image(self):
         """Thêm reference image"""
