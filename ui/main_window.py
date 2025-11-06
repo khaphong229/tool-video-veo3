@@ -307,21 +307,15 @@ class MainWindow(QMainWindow):
         return tab
 
     def create_scene_manager_tab(self) -> QWidget:
-        """Tạo tab Scene Manager"""
-        tab = QWidget()
-        layout = QVBoxLayout(tab)
+        """Create Scene Manager tab"""
+        from .tabs import SceneManagerTab
 
-        label = QLabel("Scene Manager Tab")
-        label.setObjectName("titleLabel")
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        tab = SceneManagerTab()
 
-        subtitle = QLabel("Manage multi-scene video projects")
-        subtitle.setObjectName("subtitleLabel")
-        subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        layout.addWidget(label)
-        layout.addWidget(subtitle)
-        layout.addStretch()
+        # Connect signals
+        tab.generate_scene_requested.connect(self.on_scene_generation_requested)
+        tab.generate_all_requested.connect(self.on_generate_all_scenes_requested)
+        tab.merge_videos_requested.connect(self.on_merge_videos_requested)
 
         return tab
 
@@ -755,6 +749,49 @@ class MainWindow(QMainWindow):
             f"Image to video generation started!\n\n"
             f"Source: {Path(params['source_image']).name}\n"
             f"Animation: {params['animation_prompt'][:50]}..."
+        )
+
+    def on_scene_generation_requested(self, scene_data: dict):
+        """Handle single scene generation request"""
+        logger.info(f"Scene generation requested: Scene {scene_data.get('scene_id')}")
+        self.set_status_message(f"Generating scene {scene_data.get('scene_id')}...")
+
+        # TODO: Implement actual scene generation
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(
+            self,
+            "Scene Generation",
+            f"Generating Scene {scene_data.get('scene_id')}\n\n"
+            f"Prompt: {scene_data.get('prompt', '')[:100]}...\n"
+            f"Model: {scene_data.get('model')}"
+        )
+
+    def on_generate_all_scenes_requested(self, scenes: list):
+        """Handle generate all scenes request"""
+        logger.info(f"Generate all scenes requested: {len(scenes)} scenes")
+        self.set_status_message(f"Generating {len(scenes)} scenes...")
+
+        # TODO: Implement batch scene generation
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(
+            self,
+            "Batch Generation",
+            f"Starting batch generation of {len(scenes)} scenes\n\n"
+            "This will generate all scenes in sequence."
+        )
+
+    def on_merge_videos_requested(self, video_paths: list):
+        """Handle merge videos request"""
+        logger.info(f"Merge videos requested: {len(video_paths)} videos")
+        self.set_status_message(f"Merging {len(video_paths)} videos...")
+
+        # TODO: Implement video merging
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(
+            self,
+            "Video Merging",
+            f"Merging {len(video_paths)} videos into final output\n\n"
+            "This may take a few minutes..."
         )
 
 
