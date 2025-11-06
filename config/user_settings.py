@@ -9,7 +9,7 @@ from typing import Any, Dict, Optional
 from datetime import datetime
 
 from .settings import BASE_DIR, OUTPUT_DIR, TEMP_DIR, DEFAULT_MODEL, DEFAULT_RESOLUTION, DEFAULT_ASPECT_RATIO, VIDEO_DURATION_RANGE, DEFAULT_FPS
-from utils import get_logger
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 

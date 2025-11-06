@@ -9,11 +9,13 @@ from pathlib import Path
 from logging.handlers import RotatingFileHandler
 from typing import Optional
 
-from config import settings
-
-
 # Dictionary lưu trữ các logger đã tạo để tránh tạo duplicate
 _loggers = {}
+
+# Lazy import settings to avoid circular dependency
+def _get_settings():
+    from config import settings
+    return settings
 
 
 def get_logger(name: str = __name__) -> logging.Logger:
@@ -41,12 +43,12 @@ def get_logger(name: str = __name__) -> logging.Logger:
     # Chỉ cấu hình nếu logger chưa có handler
     if not logger.handlers:
         # Set log level từ settings
-        log_level = getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO)
+        log_level = getattr(logging, _get_settings().LOG_LEVEL.upper(), logging.INFO)
         logger.setLevel(log_level)
 
         # Tạo formatter
         formatter = logging.Formatter(
-            settings.LOG_FORMAT,
+            _get_settings().LOG_FORMAT,
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
@@ -61,13 +63,13 @@ def get_logger(name: str = __name__) -> logging.Logger:
         # Ghi log ra file với rotation
         try:
             # Đảm bảo thư mục log tồn tại
-            settings.LOG_DIR.mkdir(parents=True, exist_ok=True)
+            _get_settings().LOG_DIR.mkdir(parents=True, exist_ok=True)
 
             # Tạo rotating file handler
             file_handler = RotatingFileHandler(
-                filename=settings.LOG_FILE_PATH,
-                maxBytes=settings.MAX_LOG_SIZE,
-                backupCount=settings.LOG_BACKUP_COUNT,
+                filename=_get_settings().LOG_FILE_PATH,
+                maxBytes=_get_settings().MAX_LOG_SIZE,
+                backupCount=_get_settings().LOG_BACKUP_COUNT,
                 encoding='utf-8'
             )
             file_handler.setLevel(log_level)
@@ -103,10 +105,10 @@ def setup_logging(
     """
     # Sử dụng giá trị mặc định nếu không được cung cấp
     if log_level is None:
-        log_level = settings.LOG_LEVEL
+        log_level = _get_settings().LOG_LEVEL
 
     if log_file is None:
-        log_file = settings.LOG_FILE_PATH
+        log_file = _get_settings().LOG_FILE_PATH
 
     # Chuyển đổi string log level thành constant
     numeric_level = getattr(logging, log_level.upper(), logging.INFO)
@@ -114,15 +116,15 @@ def setup_logging(
     # Cấu hình root logger
     logging.basicConfig(
         level=numeric_level,
-        format=settings.LOG_FORMAT,
+        format=_get_settings().LOG_FORMAT,
         handlers=[
             # Console handler
             logging.StreamHandler(sys.stdout),
             # File handler với rotation
             RotatingFileHandler(
                 filename=log_file,
-                maxBytes=settings.MAX_LOG_SIZE,
-                backupCount=settings.LOG_BACKUP_COUNT,
+                maxBytes=_get_settings().MAX_LOG_SIZE,
+                backupCount=_get_settings().LOG_BACKUP_COUNT,
                 encoding='utf-8'
             )
         ]
@@ -171,12 +173,12 @@ def clear_logs() -> bool:
         logger.info("Đang xóa các file log...")
 
         # Xóa file log chính
-        if settings.LOG_FILE_PATH.exists():
-            settings.LOG_FILE_PATH.unlink()
+        if _get_settings().LOG_FILE_PATH.exists():
+            _get_settings().LOG_FILE_PATH.unlink()
 
         # Xóa các backup log files
-        for i in range(1, settings.LOG_BACKUP_COUNT + 1):
-            backup_file = settings.LOG_DIR / f"{settings.LOG_FILE}.{i}"
+        for i in range(1, _get_settings().LOG_BACKUP_COUNT + 1):
+            backup_file = _get_settings().LOG_DIR / f"{_get_settings().LOG_FILE}.{i}"
             if backup_file.exists():
                 backup_file.unlink()
 
@@ -203,12 +205,12 @@ def get_log_size() -> int:
 
     try:
         # Kích thước file log chính
-        if settings.LOG_FILE_PATH.exists():
-            total_size += settings.LOG_FILE_PATH.stat().st_size
+        if _get_settings().LOG_FILE_PATH.exists():
+            total_size += _get_settings().LOG_FILE_PATH.stat().st_size
 
         # Kích thước các backup files
-        for i in range(1, settings.LOG_BACKUP_COUNT + 1):
-            backup_file = settings.LOG_DIR / f"{settings.LOG_FILE}.{i}"
+        for i in range(1, _get_settings().LOG_BACKUP_COUNT + 1):
+            backup_file = _get_settings().LOG_DIR / f"{_get_settings().LOG_FILE}.{i}"
             if backup_file.exists():
                 total_size += backup_file.stat().st_size
 
