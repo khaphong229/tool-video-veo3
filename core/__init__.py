@@ -13,6 +13,7 @@ from .generators import (
     GenerationTimeoutError,
     GenerationFailedError
 )
+from .managers import SceneManager
 
 __all__ = [
     'VeoAPIClient',
@@ -25,5 +26,6 @@ __all__ = [
     'GenerationError',
     'APIQuotaExceededError',
     'GenerationTimeoutError',
-    'GenerationFailedError'
+    'GenerationFailedError',
+    'SceneManager'
 ]
