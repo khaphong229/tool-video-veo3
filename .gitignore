@@ -79,3 +79,9 @@ dmypy.json
 Thumbs.db
 .claude/settings.local.json
 nul
+
+# But allow README.md
+!README.md
+
+# Also allow .gitignore itself (optional)
+!.gitignore
